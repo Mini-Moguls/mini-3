@@ -2,10 +2,10 @@
   "name": "mini-3",
   "version": "1.0.0",
   "private": true,
-  "description": "Mini Moguls Market Day — Community Hub & Interactive Guide Edition (Harare, Zimbabwe)",
+  "description": "Mini Moguls Market Day \u2014 Community Hub & Interactive Guide Edition (Harare, Zimbabwe)",
   "scripts": {
-    "dev": "tailwindcss -i src/input.css -o assets/css/style.css --watch",
-    "build": "tailwindcss -i src/input.css -o assets/css/style.css --minify"
+    "dev": "node init && tailwindcss -i src/input.css -o assets/css/style.css --watch",
+    "build": "node init && tailwindcss -i src/input.css -o assets/css/style.css --minify"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.2",
