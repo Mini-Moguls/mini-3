@@ -1409,6 +1409,7 @@ document.documentElement.classList.add('js');
       const day = dayNum(sundaySel.value);
       const time = $('input[name="time"]:checked', form).value;
       const name = $('#v-name').value.trim().split(' ')[0];
+      postToMiniMogulsEmail(form, 'info@minimoguls.online', 'Mini Moguls Registration & Visit Enquiry');
       // To connect: send new FormData(form) to your form service here (see DOCS.md, Forms).
       successSwap(form, `<p class="font-display text-2xl font-extrabold">Registration Enquiry Ready, ${escapeHtml(name)}!</p>
         <p class="mt-3 leading-relaxed text-muted">Your parent/guardian registration summary for <strong>Saturday, 12 December 2026 (10:00 AM – 4:00 PM · Harare)</strong> has been validated on this device (Ref: <strong class="text-ink">${makeRef('MM')}</strong>).</p>
@@ -1471,6 +1472,7 @@ document.documentElement.classList.add('js');
       const a = amount();
       const fee = cover.checked ? feeFor(a) : 0;
       const freq = $('input[name="frequency"]:checked', form).value;
+      postToMiniMogulsEmail(form, 'partners@minimoguls.online', 'Mini Moguls Sponsorship & Partnership Inquiry', { indicative_amount_usd: a, fund_area: GIVING.funds[fund.value] });
       // Connect your payment provider here (Stripe Checkout, PayPal, Tithe.ly, Planning Center
       // Giving...): create a checkout session on your server and redirect to it. See DOCS.md.
       successSwap(form, `<p class="font-display text-2xl font-extrabold">Thank you for supporting young moguls, ${escapeHtml($('#g-name').value.trim().split(' ')[0])}!</p>
@@ -1572,6 +1574,23 @@ document.documentElement.classList.add('js');
     return prefix + '-' + out;
   }
 
+  
+  function postToMiniMogulsEmail(form, targetEmail, subject, extraFields) {
+    try {
+      const fd = new FormData(form);
+      fd.append('_subject', subject);
+      fd.append('_captcha', 'false');
+      if (extraFields) {
+        Object.keys(extraFields).forEach((k) => fd.append(k, extraFields[k]));
+      }
+      fetch('https://formsubmit.co/ajax/' + targetEmail, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: fd
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
   function successSwap(form, html) {
     const box = document.createElement('div');
     box.setAttribute('role', 'status');
@@ -1585,7 +1604,8 @@ document.documentElement.classList.add('js');
   function initForms() {
     // To connect a form: replace successSwap(...) with a fetch() to your form service, e.g.
     // fetch('https://formspree.io/f/your-id', { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
-    $$('[data-form="newsletter"]').forEach((form) => setupValidation(form, () => {
+    $('[data-form="newsletter"]').forEach((form) => setupValidation(form, () => {
+      postToMiniMogulsEmail(form, 'info@minimoguls.online', 'Mini Moguls Event Updates Sign-up');
       successSwap(form, '<p class="font-display text-xl font-extrabold">You’re on the Mini Moguls update list!</p><p class="mt-2 text-muted">Note: Connect a newsletter service in <code>assets/js/main.js</code> to save email sign-ups automatically. For immediate updates on registration deadlines, call <a href="tel:+263771222748" class="link">+263 771 222 748</a>.</p>');
     }));
 
@@ -1605,6 +1625,8 @@ document.documentElement.classList.add('js');
         note.hidden = false;
       }
       setupValidation(contact, () => {
+        const isPartner = $('#c-topic') && $('#c-topic').value === 'giving';
+        postToMiniMogulsEmail(contact, isPartner ? 'partners@minimoguls.online' : 'info@minimoguls.online', 'Mini Moguls Website Contact Enquiry');
         successSwap(contact, `<p class="font-display text-2xl font-extrabold">Thanks, ${escapeHtml($('#c-name').value.trim().split(' ')[0])}!</p><p class="mt-3 leading-relaxed text-muted">Your enquiry has been validated in the browser (Ref: <strong class="text-ink">${makeRef('MM')}</strong>). Because a backend form endpoint must be connected in <code>assets/js/main.js</code> before messages are transmitted automatically, please also reach the Harare organising team directly on <a href="tel:+263771222748" class="link">+263 771 222 748</a> or <a href="tel:+263783116564" class="link">+263 783 116 564</a>.</p>`);
       });
     }
@@ -1622,6 +1644,7 @@ document.documentElement.classList.add('js');
       priv.addEventListener('change', sync);
       sync();
       setupValidation(prayer, () => {
+        postToMiniMogulsEmail(prayer, 'info@minimoguls.online', 'Mini Moguls Young Mogul Stall Idea Submission');
         const name = $('#p-name').value.trim().split(' ')[0];
         successSwap(prayer, `<p class="font-display text-2xl font-extrabold">${name ? 'Great idea, ' + escapeHtml(name) + '!' : 'Thank you for sharing your stall idea!'}</p>
           <p class="mt-3 leading-relaxed text-muted">Your young mogul product concept or question has been checked on this device. Connect a backend form endpoint in <code>assets/js/main.js</code> to store submissions, or call the organisers directly on <a href="tel:+263771222748" class="link">+263 771 222 748</a> / <a href="tel:+263783116564" class="link">+263 783 116 564</a>.</p>`);
